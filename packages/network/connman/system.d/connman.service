@@ -3,7 +3,7 @@ Description=Connection service
 DefaultDependencies=false
 Conflicts=shutdown.target
 Before=network.target multi-user.target shutdown.target
-After=dbus.service
+After=dbus.service network-pre.target
 Wants=network.target
 
 [Service]
