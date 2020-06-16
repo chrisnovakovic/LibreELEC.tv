@@ -1082,9 +1082,6 @@ for arg in $(cat /proc/cmdline); do
     bigfont=*)
       BIGFONT="${arg#*=}"
       ;;
-    ip=*)
-      KERNEL_IPCONFIG="yes"
-      ;;
   esac
 done
 
@@ -1153,7 +1150,12 @@ if [ "$FLASH_NETBOOT" = "yes" ]; then
   echo "" > /sysroot/dev/.flash_netboot
 fi
 
-if [ "$KERNEL_IPCONFIG" = "yes" ]; then
+# Tell userspace if network was configured manually via kernel-level IP
+# autoconfiguration, so systemd can avoid starting daemons that reconfigure the
+# interface (don't do this if DHCP was used: the interface will still need to be
+# managed in userspace, because the kernel doesn't contain a DHCP client daemon
+# to keep the lease active)
+if grep -qx '#PROTO: MANUAL' /proc/net/pnp 2>/dev/null; then
   echo "" > /sysroot/dev/.kernel_ipconfig
 fi
 
